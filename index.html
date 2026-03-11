@@ -1,18 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<!-- iOS App Icon -->
-<head>
 <meta charset="UTF-8">
-
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Thanh Son iOS">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thanh Son iOS</title>
+<title>PhuocKhatNuoc</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;font-family:Arial}
@@ -32,30 +22,34 @@ body{
 /* chú ý: canvas sẽ nằm trên nội dung (để tuyết rơi thấy rõ),
    nhưng pointer-events: none để không chặn tương tác */
 #snow,#lightning{position:absolute;top:0;left:0;z-index:4;pointer-events:none}
-.card>*:not(canvas):not(.crosshair){position:relative;z-index:2}
+.card>*:not(canvas){position:relative;z-index:2}
 
 #title{text-align:center;font-size:32px;color:#00ffff;text-shadow:0 0 5px #0ff,0 0 20px #09f}
-.status{text-align:center;font-weight:bold}
+.status{text-align:center;font-weight:bold; margin-bottom: 10px;}
 .status.inactive{color:orange}
 .status.active{color:#00ff88}
 
+/* CSS cho hệ thống Key */
 .key-box{display:flex;gap:10px;margin:10px 0}
 .key-box input{flex:1;padding:10px;border-radius:8px;border:none}
 .key-box button{padding:10px;border:none;border-radius:8px;background:#00e676;font-weight:bold;cursor:pointer}
+.expire{text-align:center;color:#00ff88;font-size:14px; margin-bottom: 10px; min-height: 16px;}
 
-.expire{text-align:center;color:#00ff88;font-size:14px}
-.notify{text-align:center;height:22px;font-weight:bold}
+.notify{text-align:center;height:22px;font-weight:bold; margin-bottom: 10px;}
 
-.game-select{display:flex;gap:10px;margin:10px 0}
-.game-btn{flex:1;padding:10px;border-radius:10px;background:#222;color:#fff;border:none;cursor:pointer}
+.game-select{display:flex;gap:10px;margin:10px 0 20px 0;}
+.game-btn{flex:1;padding:10px;border-radius:10px;background:#222;color:#fff;border:none;cursor:pointer; font-weight:bold;}
 .game-btn.active{background:#ff5722;color:#000}
 
 .feature .item{
   display:flex;justify-content:space-between;
   align-items:center;padding:12px;
-  background:#151d29;border-radius:12px;margin-bottom:8px
+  background:#151d29;border-radius:12px;margin-bottom:8px;
+  transition: 0.3s;
 }
-.locked .item{opacity:.4}
+
+/* CSS khi chưa kích hoạt */
+.locked .item{opacity:0.4; pointer-events:none;}
 
 .switch{position:relative;width:52px;height:28px}
 .switch input{opacity:0}
@@ -69,38 +63,23 @@ body{
   box-shadow:0 0 10px rgba(0,255,136,.8)
 }
 .switch input:checked+.slider:before{transform:translateX(24px);background:#fff}
-
-/* crosshair phải nằm trên canvas nên z-index cao hơn */
-.crosshair{
-  position:absolute;top:50%;left:50%;
-  width:36px;height:36px;border:2px solid #0ff;
-  border-radius:50%;transform:translate(-50%,-50%);
-  display:none;pointer-events:none;z-index:6;
-  box-shadow:0 0 8px #0ff,inset 0 0 6px #0ff
-}
-.crosshair:before,.crosshair:after{content:"";position:absolute;background:#0ff}
-.crosshair:before{width:2px;height:18px;left:50%;top:50%;transform:translate(-50%,-50%)}
-.crosshair:after{height:2px;width:18px;left:50%;top:50%;transform:translate(-50%,-50%)}
 </style>
 </head>
 
 <body>
 <div class="container">
   <div class="card" id="card">
-    <!-- canvas tuyết và sấm sét -->
     <canvas id="snow"></canvas>
     <canvas id="lightning"></canvas>
 
-    <div id="crosshair" class="crosshair"></div>
-
-    <h1 id="title">Thanh Son iOS</h1>
+    <h1 id="title">PhuocKhatNuoc</h1>
     <p id="status" class="status inactive">Chưa kích hoạt</p>
 
-    <div class="key-box">
+    <div class="key-box" id="keyBox">
       <input id="keyInput" placeholder="Nhập key...">
       <button onclick="checkKey()">Xác nhận</button>
     </div>
-
+    
     <p id="expireText" class="expire"></p>
     <p id="notify" class="notify"></p>
 
@@ -115,67 +94,109 @@ body{
       <div class="item"><span>⚡ OPTIMIZE</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'OPTIMIZE')"><span class="slider"></span></label></div>
       <div class="item"><span>➕ SENSITIVITY PRO</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'SENSITIVITY PRO')"><span class="slider"></span></label></div>
       <div class="item"><span>⚙ LEGIT PRO</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'LEGIT PRO')"><span class="slider"></span></label></div>
-      <div class="item"><span>🎯 TÂM ẢO</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'TÂM ẢO')"><span class="slider"></span></label></div>
+      <div class="item"><span>🛡️ Fix Rung</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'Fix Rung')"><span class="slider"></span></label></div>
+      <div class="item"><span>🎯 Fix Lố</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'Fix Lố')"><span class="slider"></span></label></div>
+      <div class="item"><span>🚀 Tối ưu Fps</span><label class="switch"><input type="checkbox" disabled onchange="toggleFeature(this,'Tối ưu Fps')"><span class="slider"></span></label></div>
     </div>
   </div>
 </div>
 
 <script>
-/* ===== giữ nguyên logic key + UI như bạn yêu cầu ===== */
-const STORAGE="TSIOS_KEY_DATA";
-const deviceId=btoa(navigator.userAgent+screen.width+screen.height);
-let timer=null;
+/* ===== XỬ LÝ HỆ THỐNG KEY (OFFLINE) ===== */
+const STORAGE_KEY = "PKN_OFFLINE_KEY";
+let countdownTimer = null;
 
-function notify(t,c="#0ff"){
-  const n=document.getElementById("notify");
-  n.textContent=t; n.style.color=c;
-  setTimeout(()=>n.textContent="",2500)
+function notify(t, c="#0ff"){
+  const n = document.getElementById("notify");
+  n.textContent = t; 
+  n.style.color = c;
+  setTimeout(() => n.textContent = "", 2500);
 }
 
-function unlock(){
-  document.getElementById("status").textContent="Đã kích hoạt";
-  document.getElementById("status").className="status active";
+// Mở khóa giao diện
+function unlockUI() {
+  document.getElementById("status").textContent = "Đã kích hoạt";
+  document.getElementById("status").className = "status active";
   document.getElementById("features").classList.remove("locked");
-  document.querySelectorAll("#features input").forEach(i=>i.disabled=false)
+  document.getElementById("keyBox").style.display = "none"; // Ẩn ô nhập key
+  document.querySelectorAll("#features input").forEach(i => i.disabled = false);
 }
 
-function lock(){
-  localStorage.removeItem(STORAGE);
-  clearInterval(timer);
-  document.getElementById("status").textContent="Hết hạn";
-  document.getElementById("status").className="status inactive";
+// Khóa giao diện
+function lockUI() {
+  localStorage.removeItem(STORAGE_KEY);
+  clearInterval(countdownTimer);
+  document.getElementById("status").textContent = "Chưa kích hoạt";
+  document.getElementById("status").className = "status inactive";
   document.getElementById("features").classList.add("locked");
-  document.querySelectorAll("#features input").forEach(i=>{ i.checked=false; i.disabled=true });
-  document.getElementById("crosshair").style.display="none";
-  notify("Key đã hết hạn","#f44336")
+  document.getElementById("keyBox").style.display = "flex"; // Hiện ô nhập key
+  document.getElementById("expireText").textContent = "";
+  document.querySelectorAll("#features input").forEach(i => { i.checked = false; i.disabled = true; });
 }
 
-function startTimer(exp){
-  clearInterval(timer);
-  timer=setInterval(()=>{
-    const left=exp-Date.now();
-    if(left<=0) return lock();
-    const h=Math.floor(left/3600000);
-    const m=Math.floor(left%3600000/60000);
-    const s=Math.floor(left%60000/1000);
-    document.getElementById("expireText").textContent=`Còn lại: ${h}h ${m}m ${s}s`;
-  },1000)
+// Đếm ngược thời gian
+function startTimer(expireTime) {
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    const timeLeft = expireTime - Date.now();
+    if (timeLeft <= 0) {
+      notify("Key đã hết hạn!", "#ff3333");
+      return lockUI();
+    }
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    
+    let timeString = "Còn lại: ";
+    if (days > 0) timeString += `${days} ngày `;
+    timeString += `${hours}h ${minutes}m ${seconds}s`;
+    
+    document.getElementById("expireText").textContent = timeString;
+  }, 1000);
 }
 
-function checkKey(){
-  const key=document.getElementById("keyInput").value.trim();
-  if(!key.startsWith("THANHSONIOS-")) return notify("Key không hợp lệ","#ff9800");
-  const days=parseInt(key.split("-")[1]);
-  if(isNaN(days)) return notify("Sai định dạng key","#ff9800");
-  const exp=Date.now()+days*86400000;
-  localStorage.setItem(STORAGE,JSON.stringify({key,exp,deviceId}));
-  unlock(); startTimer(exp);
-  notify("Kích hoạt thành công","#00ff88")
+// Kiểm tra key khi bấm Xác nhận
+function checkKey() {
+  const keyInput = document.getElementById("keyInput").value.trim();
+  
+  if (!keyInput.startsWith("PhuocKhatNuoc-")) {
+    return notify("Key không hợp lệ!", "#ff9800");
+  }
+
+  const daysStr = keyInput.split("-")[1];
+  const days = parseInt(daysStr);
+
+  // Chỉ chấp nhận 7, 30 hoặc 365
+  if (days !== 7 && days !== 30 && days !== 365) {
+    return notify("Gói Key không tồn tại!", "#ff9800");
+  }
+
+  // Tính thời gian hết hạn: Hiện tại + (Số ngày * 24h * 60p * 60s * 1000ms)
+  const expireTime = Date.now() + days * 86400000;
+  
+  // Lưu vào localStorage
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ key: keyInput, exp: expireTime }));
+  
+  unlockUI();
+  startTimer(expireTime);
+  notify("Kích hoạt thành công!", "#00ff88");
 }
 
+// Tự động kiểm tra key cũ khi tải trang
+function checkSavedKey() {
+  const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+  if (savedData && savedData.exp > Date.now()) {
+    unlockUI();
+    startTimer(savedData.exp);
+  } else {
+    lockUI();
+  }
+}
+
+/* ===== Xử lý Nút Chức Năng ===== */
 function toggleFeature(cb,name){
-  if(name==="TÂM ẢO") document.getElementById("crosshair").style.display=cb.checked?"block":"none";
-  notify((cb.checked?"Bật ":"Tắt ")+name, cb.checked?"#00ff88":"#ff9800")
+  notify((cb.checked?"Bật ":"Tắt ")+name, cb.checked?"#00ff88":"#ff9800");
 }
 
 function selectGame(g){
@@ -184,22 +205,10 @@ function selectGame(g){
   btnNormal.classList.remove("active");
   btnMax.classList.remove("active");
   (g==="normal"?btnNormal:btnMax).classList.add("active");
-  notify("Đã chọn "+(g==="normal"?"Free Fire Thường":"Free Fire Max"),"#00ff88")
+  notify("Đã chọn "+(g==="normal"?"Free Fire Thường":"Free Fire Max"),"#00ff88");
 }
 
-window.onload=()=>{
-  const d=JSON.parse(localStorage.getItem(STORAGE)||"null");
-  if(d && d.deviceId===deviceId && d.exp>Date.now()){
-    unlock(); startTimer(d.exp)
-  }
-}
-
-/* ===== TUYẾT RƠI (CẢI TIẾN) =====
-   - canvas sẽ cover toàn bộ .card area (dynamic)
-   - pointer-events:none nên vẫn click được bình thường
-   - ResizeObserver để chiều cao/chiều rộng tự cập nhật khi layout thay đổi
-*/
-
+/* ===== TUYẾT RƠI VÀ SẤM SÉT ===== */
 const card = document.getElementById('card');
 const snow = document.getElementById('snow');
 const lightning = document.getElementById('lightning');
@@ -207,23 +216,19 @@ const sx = snow.getContext('2d');
 const lx = lightning.getContext('2d');
 
 let flakes = [];
-let FL_COUNT = 260; // tăng để dày đặc hơn
+let FL_COUNT = 260; 
 let snowW = 360, snowH = 520;
 
 function resizeCanvases(){
-  // lấy kích thước thực của .card
   const rect = card.getBoundingClientRect();
-  const w = Math.max(200, Math.floor(rect.width)); // đảm bảo min width
-  const h = Math.max(200, Math.floor(rect.height)); // đảm bảo min height
-  // set kích thước canvas theo card
+  const w = Math.max(200, Math.floor(rect.width)); 
+  const h = Math.max(200, Math.floor(rect.height)); 
   snowW = w; snowH = h;
   snow.width = w; snow.height = h;
   lightning.width = w; lightning.height = h;
-  // nếu flakes rỗng hoặc kích thước thay đổi lớn thì recreate
   initFlakes();
 }
 
-// tạo mảng flakes
 function initFlakes(){
   flakes = [];
   for(let i=0;i<FL_COUNT;i++){
@@ -238,15 +243,12 @@ function initFlakes(){
   }
 }
 
-// vẽ tuyết
 function drawSnow(){
   sx.clearRect(0,0,snowW,snowH);
-  // tô nhẹ nền (không che nội dung vì pointer-events:none)
   for(let f of flakes){
     f.phase += 0.01 + f.sway*0.003;
-    f.x += Math.sin(f.phase) * f.sway; // drift
+    f.x += Math.sin(f.phase) * f.sway; 
     f.y += f.v;
-    // khi vượt ra ngoài đáy thì cho rơi lại ở top (để full rơi xuyên suốt)
     if(f.y > snowH + 10){
       f.y = -10;
       f.x = Math.random()*snowW;
@@ -255,10 +257,8 @@ function drawSnow(){
       f.sway = (Math.random()*0.6) + 0.2;
       f.phase = Math.random()*Math.PI*2;
     }
-    // vẽ
     sx.beginPath();
     sx.arc(f.x, f.y, f.r, 0, Math.PI*2);
-    // làm nhiều mức alpha để cảm giác gần/xa
     const alpha = 0.6 - (f.r-1)/6;
     sx.fillStyle = `rgba(255,255,255,${alpha})`;
     sx.fill();
@@ -266,9 +266,8 @@ function drawSnow(){
   requestAnimationFrame(drawSnow);
 }
 
-/* ===== SẤM SÉT (giữ như trước nhưng tính theo kích thước mới) ===== */
 function lightningPulse(){
-  if(Math.random() < 0.6) return; // tỉ lệ sấm
+  if(Math.random() < 0.6) return; 
   lx.fillStyle = "rgba(255,255,255,0.12)";
   lx.fillRect(0,0,snowW,snowH);
   lx.beginPath();
@@ -286,7 +285,6 @@ function lightningPulse(){
   setTimeout(()=>lx.clearRect(0,0,snowW,snowH),120);
 }
 
-// ResizeObserver để cập nhật canvas khi card thay đổi (ví dụ thay đổi nội dung)
 if (window.ResizeObserver) {
   const ro = new ResizeObserver(() => {
     resizeCanvases();
@@ -296,11 +294,11 @@ if (window.ResizeObserver) {
   window.addEventListener('resize', resizeCanvases);
 }
 
-// khởi tạo
+// Khởi chạy các hàm
+checkSavedKey();
 resizeCanvases();
 drawSnow();
 setInterval(lightningPulse, 2500);
-
 </script>
 </body>
 </html>
